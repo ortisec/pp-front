@@ -105,7 +105,15 @@ export function LoginPage() {
           </button>
 
           <p className="text-center text-xs text-ink-400">
-            Demo: DNI 12345678 (mesa) / 87654321 (local) · admin / admin123
+            Desarrollado por{' '}
+            <a
+              href="https://github.com/ortisec"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-brand-600 hover:underline"
+            >
+              ortisec
+            </a>
           </p>
         </form>
       </div>
