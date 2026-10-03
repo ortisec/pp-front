@@ -22,17 +22,19 @@ La app queda en `http://localhost:5173`. Vite hace proxy de `/api`
 
 ## Produccion
 
-La URL de la API se configura con la variable `VITE_API_URL`:
+La URL de la API se configura con la variable `VITE_API_URL`.
 
-- `.env.production` (build de produccion). Por defecto:
-  ```
-  VITE_API_URL=/api/v1
-  ```
-  Se usa cuando el front y la API comparten dominio (Nginx hace el proxy).
-  Si la API vive en otro dominio:
-  ```
-  VITE_API_URL=https://api.tudominio.com/api/v1
-  ```
+Como el frontend se despliega en **Vercel** y la API en **EasyPanel** (dominios
+distintos), se usa la URL absoluta de la API:
+
+```
+VITE_API_URL=https://iot-pp.p6eoke.easypanel.host/api/v1
+```
+
+En Vercel, define esta variable en **Settings > Environment Variables**
+(entorno Production) o edita `.env.production` antes del build.
+
+- `.env.production` (build de produccion): URL absoluta de la API.
 - `.env` (desarrollo): dejalo vacio para usar el proxy de Vite.
 
 Genera la build con:
@@ -41,7 +43,8 @@ Genera la build con:
 npm run build
 ```
 
-Sirve el contenido de `dist/` con Nginx (o el mismo Nginx que proxya `/api/`).
+> Importante: en la API (EasyPanel) agrega el dominio de Vercel a
+> `CORS_ORIGINS` para permitir las peticiones del frontend.
 
 ## Scripts
 
