@@ -1,32 +1,75 @@
-# React + TypeScript + Vite
+# Podemos Peru - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicacion web (React + TypeScript + Vite + Tailwind CSS) para el registro y
+visualizacion en tiempo real de resultados de elecciones regionales y
+municipales del Peru.
 
-Currently, two official plugins are available:
+## Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20+
+- La API (`pp-api`) corriendo. En desarrollo el proxy apunta a
+  `http://localhost:8477` (donde el compose publica la API).
 
-## React Compiler
+## Desarrollo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+La app queda en `http://localhost:5173`. Vite hace proxy de `/api`
+(incluyendo WebSocket) hacia `http://localhost:8477`.
+
+## Produccion
+
+La URL de la API se configura con la variable `VITE_API_URL`:
+
+- `.env.production` (build de produccion). Por defecto:
+  ```
+  VITE_API_URL=/api/v1
+  ```
+  Se usa cuando el front y la API comparten dominio (Nginx hace el proxy).
+  Si la API vive en otro dominio:
+  ```
+  VITE_API_URL=https://api.tudominio.com/api/v1
+  ```
+- `.env` (desarrollo): dejalo vacio para usar el proxy de Vite.
+
+Genera la build con:
+
+```bash
+npm run build
+```
+
+Sirve el contenido de `dist/` con Nginx (o el mismo Nginx que proxya `/api/`).
+
+## Scripts
+
+| Comando         | Descripcion                          |
+| --------------- | ------------------------------------ |
+| `npm run dev`   | Servidor de desarrollo con HMR       |
+| `npm run build` | Compila TypeScript y genera `dist/`  |
+| `npm run lint`  | Ejecuta oxlint                       |
+| `npm run preview` | Sirve la build de produccion       |
+
+## Roles
+
+- **Administrador**: usuario y contrasena. Gestiona procesos electorales,
+  geografia (provincias/distritos), locales, mesas, partidos, usuarios y
+  asignaciones. Ve el dashboard completo.
+- **Personero de mesa**: inicia sesion solo con su DNI. Registra votos de su
+  mesa asignada.
+- **Personero de local (coordinador)**: inicia sesion solo con su DNI. Registra
+  votos de cualquier mesa de su local asignado.
+
+## Estructura
+
+```
+src/
+  api/         cliente HTTP y tipos
+  auth/        contexto de autenticacion
+  components/  UI reutilizable (modales, badges, graficos, formulario de votos)
+  pages/       Login, Dashboard, Admin y vistas de personero
+  pages/admin/ paneles del administrador
+  ui/          estilos base compartidos
+```
