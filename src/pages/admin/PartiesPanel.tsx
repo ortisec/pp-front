@@ -84,15 +84,35 @@ export function PartiesPanel({ process, onNotify }: Props) {
     }
   }
 
+  async function syncParties() {
+    if (!process) return
+    setSaving(true)
+    try {
+      const res = await api.post<{ message: string; created: number }>(
+        `/admin/table-parties/sync?process_id=${process.id}`,
+      )
+      onNotify(res.message)
+    } catch (err) {
+      onNotify(err instanceof ApiError ? String(err.detail) : 'No se pudo sincronizar.', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-ink-500">
           {process ? `${parties.length} partido(s) en ${process.name}` : 'Seleccione un proceso'}
         </p>
-        <button className={btnPrimary} onClick={openCreate} disabled={!process}>
-          + Nuevo partido
-        </button>
+        <div className="flex gap-2">
+          <button className={btnSecondary} onClick={syncParties} disabled={!process || saving}>
+            ⟳ Sincronizar con mesas
+          </button>
+          <button className={btnPrimary} onClick={openCreate} disabled={!process}>
+            + Nuevo partido
+          </button>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-ink-200 bg-white">
