@@ -6,13 +6,13 @@ export type VoteType = 'VALIDO' | 'NULO' | 'BLANCO'
 
 export type RecordStatus = 'BORRADOR' | 'CONFIRMADO'
 
-export const CATEGORIES: Category[] = ['GOBERNADOR', 'CONSEJERO', 'PROVINCIA', 'DISTRITO']
+export const CATEGORIES: Category[] = ['PROVINCIA', 'DISTRITO']
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  GOBERNADOR: 'Gobernador y Vicegobernador Regional',
+  PROVINCIA: 'Provincial',
+  DISTRITO: 'Distrital',
+  GOBERNADOR: 'Gobernador Regional',
   CONSEJERO: 'Consejero Regional',
-  PROVINCIA: 'Provincia',
-  DISTRITO: 'Distrito',
 }
 
 export interface ScopeInfo {

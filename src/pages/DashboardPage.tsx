@@ -43,7 +43,7 @@ export function DashboardPage() {
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState('')
   const [tab, setTab] = useState<Tab>('graficos')
-  const [category, setCategory] = useState<Category>('GOBERNADOR')
+  const [category, setCategory] = useState<Category>('PROVINCIA')
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
@@ -412,7 +412,7 @@ export function DashboardPage() {
                 <p className="mt-1 text-xs text-amber-700">Observacion: {table.comment}</p>
               )}
 
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {table.categories.map((cat) => (
                   <div key={cat.category} className="rounded-xl bg-ink-50 p-3">
                     <h4 className="text-xs font-semibold text-ink-700">{CATEGORY_LABELS[cat.category]}</h4>
