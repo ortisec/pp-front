@@ -15,6 +15,7 @@ export function TablesPanel({ process, onNotify }: Props) {
   const [tables, setTables] = useState<PollingTable[]>([])
   const [schools, setSchools] = useState<School[]>([])
   const [filterSchool, setFilterSchool] = useState<number | ''>('')
+  const [searchTable, setSearchTable] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<PollingTable | null>(null)
   const [form, setForm] = useState(EMPTY)
@@ -35,7 +36,16 @@ export function TablesPanel({ process, onNotify }: Props) {
   }, [load])
 
   const schoolName = (id: number) => schools.find((s) => s.id === id)?.name ?? `Local #${id}`
-  const visible = filterSchool ? tables.filter((t) => t.school_id === filterSchool) : tables
+  const visible = tables.filter((t) => {
+    if (filterSchool && t.school_id !== filterSchool) return false
+    if (searchTable.trim()) {
+      const q = searchTable.trim().toLowerCase()
+      const matchNumber = String(t.number).toLowerCase().includes(q)
+      const matchCode = t.code ? t.code.toLowerCase().includes(q) : false
+      if (!matchNumber && !matchCode) return false
+    }
+    return true
+  })
 
   function openCreate() {
     setEditing(null)
@@ -99,21 +109,52 @@ export function TablesPanel({ process, onNotify }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <label className="flex items-center gap-2 text-sm text-ink-500">
-          Local:
-          <select
-            className={cn(inputClass, 'w-auto')}
-            value={filterSchool}
-            onChange={(e) => setFilterSchool(e.target.value ? Number(e.target.value) : '')}
-          >
-            <option value="">Todos</option>
-            {schools.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 text-sm text-ink-600">
+            <span>Buscar mesa:</span>
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                placeholder="Digitar N° de mesa..."
+                className={cn(inputClass, 'w-48 pr-8')}
+                value={searchTable}
+                onChange={(e) => setSearchTable(e.target.value)}
+              />
+              {searchTable && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTable('')}
+                  className="absolute right-2 text-xs text-ink-400 hover:text-ink-700"
+                  title="Limpiar búsqueda"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </label>
+
+          <label className="flex items-center gap-2 text-sm text-ink-600">
+            <span>Local:</span>
+            <select
+              className={cn(inputClass, 'w-auto')}
+              value={filterSchool}
+              onChange={(e) => setFilterSchool(e.target.value ? Number(e.target.value) : '')}
+            >
+              <option value="">Todos los locales</option>
+              {schools.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <span className="text-xs text-ink-400">
+            {visible.length} {visible.length === 1 ? 'mesa' : 'mesas'}
+            {tables.length !== visible.length && ` (de ${tables.length})`}
+          </span>
+        </div>
+
         <button className={btnPrimary} onClick={openCreate} disabled={!process || !schools.length}>
           + Nueva mesa
         </button>
@@ -158,7 +199,16 @@ export function TablesPanel({ process, onNotify }: Props) {
             {!visible.length && (
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-center text-ink-400">
-                  No hay mesas registradas.
+                  {searchTable.trim() || filterSchool ? (
+                    <div>
+                      <p className="font-medium text-ink-600">No se encontraron mesas</p>
+                      <p className="mt-1 text-xs text-ink-400">
+                        No hay mesas que coincidan con los filtros aplicados.
+                      </p>
+                    </div>
+                  ) : (
+                    'No hay mesas registradas.'
+                  )}
                 </td>
               </tr>
             )}

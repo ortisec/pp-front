@@ -10,6 +10,7 @@ export function PersoneroLocalPage() {
   const schoolId = user?.scopes.find((s) => s.school_id)?.school_id ?? null
   const [tables, setTables] = useState<PollingTableLite[]>([])
   const [selected, setSelected] = useState<number | null>(null)
+  const [searchTable, setSearchTable] = useState('')
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -30,14 +31,36 @@ export function PersoneroLocalPage() {
       </p>
     )
 
+  const visibleTables = tables.filter((t) =>
+    searchTable.trim() ? String(t.number).includes(searchTable.trim()) : true,
+  )
+
   return (
     <div className="grid gap-5 lg:grid-cols-[240px_1fr]">
       <aside className="lg:sticky lg:top-20 lg:self-start">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-500">
-          Mesas del local
-        </h3>
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-500">
+            Mesas del local
+          </h3>
+          <span className="text-xs text-ink-400">
+            {visibleTables.length} de {tables.length}
+          </span>
+        </div>
+
+        {tables.length > 5 && (
+          <div className="mb-2">
+            <input
+              type="text"
+              placeholder="Buscar N° de mesa..."
+              className={cn(inputClass, 'py-1 text-xs')}
+              value={searchTable}
+              onChange={(e) => setSearchTable(e.target.value)}
+            />
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-2 lg:flex-col">
-          {tables.map((t) => (
+          {visibleTables.map((t) => (
             <button
               key={t.id}
               type="button"
@@ -53,6 +76,9 @@ export function PersoneroLocalPage() {
               <span className="text-xs text-ink-400">{t.electores_habilitados} elect.</span>
             </button>
           ))}
+          {!visibleTables.length && (
+            <p className="text-xs text-ink-400 py-2">No se encontró la mesa {searchTable}.</p>
+          )}
           {!tables.length && <p className="text-sm text-ink-500">Sin mesas asignadas.</p>}
         </div>
         {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
