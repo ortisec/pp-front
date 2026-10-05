@@ -3,7 +3,7 @@ import { api } from '../api/client'
 import type { PollingTableLite } from '../api/adminTypes'
 import { useAuth } from '../auth/AuthContext'
 import { VoteForm } from '../components/VoteForm'
-import { cn } from '../ui/styles'
+import { cn, inputClass } from '../ui/styles'
 
 export function PersoneroLocalPage() {
   const { user } = useAuth()
